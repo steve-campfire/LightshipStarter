@@ -1,26 +1,18 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PlacementOnMesh_Character : MonoBehaviour
+public class PlacementOnMesh : MonoBehaviour
 {
     [SerializeField] private Camera mainCam;
     [SerializeField] private GameObject placementObject;
 
     private List<GameObject> placedObjects = new();
-
-    private bool isPlaced = false;
-
-    public static event Action CharacterPlaced; 
-    
+    // Update is called once per frame
     void Update()
     {
-        if (isPlaced) return;
-        
-        
 #if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
         {
@@ -55,11 +47,6 @@ public class PlacementOnMesh_Character : MonoBehaviour
             Debug.Log("Touch detected, fingerId: " + touch.fingerId);  // Debugging line
 
 
-            if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
-            {
-                Debug.Log("Is Pointer Over GOJ, No placement ");
-                return;
-            }
             TouchToRay(touch.position);
         }
 #endif
@@ -72,12 +59,9 @@ public class PlacementOnMesh_Character : MonoBehaviour
         
         if (Physics.Raycast(ray ,out hit))
         {
-            
             placedObjects.Add(
                 Instantiate(placementObject, hit.point, Quaternion.FromToRotation(transform.up, hit.normal))
                 );
-            isPlaced = true;
-            CharacterPlaced?.Invoke();
         }
     }
 }
